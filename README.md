@@ -7,11 +7,23 @@
   <img src="https://img.shields.io/badge/AWS-ECS%20Fargate-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" />
 </p>
 
-# 🎙️ RAG Voice AI Agent
+<p align="center">
+  <a href="https://github.com/jaiswal-naman/rag-voice-ai-agent/stargazers"><img src="https://img.shields.io/github/stars/jaiswal-naman/rag-voice-ai-agent?style=social" alt="GitHub Stars" /></a>
+  <a href="https://github.com/jaiswal-naman/rag-voice-ai-agent/network/members"><img src="https://img.shields.io/github/forks/jaiswal-naman/rag-voice-ai-agent?style=social" alt="GitHub Forks" /></a>
+  <a href="https://github.com/jaiswal-naman/rag-voice-ai-agent/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jaiswal-naman/rag-voice-ai-agent" alt="License: MIT" /></a>
+  <a href="https://github.com/jaiswal-naman/rag-voice-ai-agent/issues"><img src="https://img.shields.io/github/issues/jaiswal-naman/rag-voice-ai-agent" alt="Open Issues" /></a>
+  <a href="https://github.com/jaiswal-naman/rag-voice-ai-agent/commits/main"><img src="https://img.shields.io/github/last-commit/jaiswal-naman/rag-voice-ai-agent" alt="Last Commit" /></a>
+</p>
 
-> **An intelligent, real-time voice assistant powered by Retrieval-Augmented Generation (RAG) for industrial equipment support.**
+<h1 align="center">🎙️ RAG Voice AI Agent</h1>
 
-Built by [**Naman Jaiswal**](https://github.com/jaiswal-naman)
+<p align="center">
+  <strong>An intelligent, real-time voice assistant powered by Retrieval-Augmented Generation (RAG) for industrial equipment support.</strong>
+</p>
+
+<p align="center">
+  Built by <a href="https://github.com/jaiswal-naman"><strong>Naman Jaiswal</strong></a>
+</p>
 
 ---
 
@@ -21,13 +33,24 @@ Built by [**Naman Jaiswal**](https://github.com/jaiswal-naman)
 
 The system combines **real-time speech processing**, **vector-based document retrieval**, and **large language model inference** into a seamless conversational pipeline — all deployable with a single `docker-compose up`.
 
-### 🎯 Key Highlights
+> 💼 **Portfolio Project** — This project showcases end-to-end AI system design: from vector database architecture and LLM tool-calling to real-time WebSocket audio streaming and cloud-native deployment on AWS ECS Fargate. It demonstrates the ability to integrate multiple cutting-edge AI services into a cohesive, production-grade product.
 
-- **Voice-First Interface** — Speak naturally, get instant spoken answers
-- **RAG-Powered Accuracy** — Responses grounded in your uploaded documents, zero hallucination
-- **Real-Time Streaming** — Sub-second latency via WebSocket-based audio pipeline
-- **Production-Ready** — Dockerized, AWS-deployable, with full CI/CD support
-- **Multi-Document Support** — Upload PDFs, DOCX, and text files per equipment
+---
+
+## ✨ Features
+
+| Feature | Description |
+|---------|-------------|
+| 🎤 **Voice-First Interface** | Speak naturally; the assistant listens, understands, and responds in real-time |
+| 🔍 **RAG-Powered Accuracy** | Every answer is grounded in your uploaded documents — zero hallucination |
+| ⚡ **Sub-Second Latency** | Full-duplex WebSocket audio pipeline with smart turn detection & VAD |
+| 📄 **Multi-Format Documents** | Upload PDF, DOCX, or plain text files per equipment unit |
+| 🤖 **LLM Tool Calling** | Groq LLM autonomously calls the vector search tool when context is needed |
+| 🌐 **Multi-Tenant Ready** | Tenant and equipment isolation at the database and retrieval layer |
+| ☁️ **Production-Ready** | Dockerized microservices, AWS ECS Fargate, full CI/CD via GitHub Actions |
+| 🔒 **Secrets Management** | API keys stored securely in AWS Secrets Manager (never in code) |
+| 📊 **Pipeline Metrics** | Built-in Pipecat metrics & usage tracking per voice session |
+| 🔄 **Auto-Reconnect** | Idle timeout, graceful disconnection, and session cleanup |
 
 ---
 
@@ -63,15 +86,36 @@ The system combines **real-time speech processing**, **vector-based document ret
               └────────────────┘
 ```
 
-### Data Flow
+### 🔄 Data Flow
 
-1. **User speaks** → Microphone captures audio via browser
-2. **Deepgram STT** → Converts speech to text in real-time
-3. **LLM (Groq)** → Processes query, triggers RAG tool call when needed
-4. **RAG Engine** → Generates embeddings (Google Gemini) → MongoDB Atlas Vector Search
-5. **LLM Response** → Formulates answer from retrieved context
-6. **ElevenLabs TTS** → Converts response to natural speech
-7. **User hears response** → Audio streamed back via WebSocket
+```
+User speaks
+    │
+    ▼
+[Browser Mic] ──WebSocket──▶ [FastAPI + Pipecat Pipeline]
+                                        │
+                              ┌─────────▼──────────┐
+                              │   Deepgram STT      │  Speech → Text
+                              └─────────┬──────────┘
+                                        │
+                              ┌─────────▼──────────┐
+                              │   Groq LLM          │  Understands intent
+                              │   (Tool Calling)    │──▶ search_knowledge_base()
+                              └─────────┬──────────┘         │
+                                        │            ┌────────▼────────┐
+                                        │            │  Gemini Embeds  │
+                                        │            │  + MongoDB      │
+                                        │            │  Vector Search  │
+                                        │            └────────┬────────┘
+                                        │◀──── Context ───────┘
+                              ┌─────────▼──────────┐
+                              │   ElevenLabs TTS    │  Text → Speech
+                              └─────────┬──────────┘
+                                        │
+                              ◀──WebSocket──── Audio Response
+                                        │
+                                   User hears answer
+```
 
 ---
 
@@ -83,13 +127,17 @@ The system combines **real-time speech processing**, **vector-based document ret
 | **Voice SDK** | Pipecat AI Client SDK | WebSocket audio transport |
 | **Backend** | FastAPI, Python 3.12+ | REST API + WebSocket server |
 | **Voice Pipeline** | Pipecat AI Framework | Orchestrates STT → LLM → TTS |
-| **Speech-to-Text** | Deepgram | Real-time audio transcription |
-| **LLM** | Groq (Llama 3 / GPT-oss) | Fast inference for responses |
+| **Speech-to-Text** | Deepgram Nova | Real-time audio transcription with diarization |
+| **LLM** | Groq (Llama 3 / GPT-oss) | Ultra-fast inference for responses (~200 ms) |
 | **Text-to-Speech** | ElevenLabs | Natural voice synthesis |
-| **Embeddings** | Google Gemini (text-embedding-004) | Document vectorization |
-| **Database** | MongoDB Atlas | Document storage + Vector Search |
+| **Embeddings** | Google Gemini (`text-embedding-004`) | 768-dim document vectorization |
+| **Vector Database** | MongoDB Atlas Vector Search | Cosine similarity retrieval with metadata filtering |
+| **Text Splitting** | LangChain | Intelligent chunking (size 1000, overlap 250) |
 | **DevOps** | Docker, Docker Compose | Containerized deployment |
-| **Cloud** | AWS ECS Fargate, CloudFormation | Production infrastructure |
+| **CI/CD** | GitHub Actions | Automated build, push, and deploy |
+| **Cloud** | AWS ECS Fargate, ALB, ECR, Secrets Manager | Production-grade serverless containers |
+| **IaC** | AWS CloudFormation | Full infrastructure as code |
+| **Package Manager** | uv | 10–100× faster than pip |
 
 ---
 
@@ -99,7 +147,7 @@ The system combines **real-time speech processing**, **vector-based document ret
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
 - API keys for: [Deepgram](https://console.deepgram.com/), [ElevenLabs](https://elevenlabs.io/), [Groq](https://console.groq.com/), [Google AI](https://aistudio.google.com/)
-- [MongoDB Atlas](https://www.mongodb.com/atlas) cluster with Vector Search index
+- [MongoDB Atlas](https://www.mongodb.com/atlas) cluster with Vector Search enabled
 
 ### 1. Clone the Repository
 
@@ -110,7 +158,11 @@ cd rag-voice-ai-agent
 
 ### 2. Configure Environment
 
-Create `backend/.env`:
+```bash
+cp backend/.env.example backend/.env
+```
+
+Edit `backend/.env`:
 
 ```env
 # MongoDB
@@ -161,17 +213,25 @@ docker-compose up --build
 
 | Service | URL |
 |---------|-----|
-| Frontend | http://localhost:3000 |
-| Backend API | http://localhost:8000 |
-| API Documentation | http://localhost:8000/docs |
+| 🖥️ Frontend | http://localhost:3000 |
+| ⚙️ Backend API | http://localhost:8000 |
+| 📖 Swagger Docs | http://localhost:8000/docs |
 
-### 5. Usage
+### 5. First Run Walkthrough
 
-1. Open the frontend at `http://localhost:3000`
-2. Create equipment via the API (`POST /api/v1/equipment/`)
-3. Upload documentation files (PDF/DOCX) for the equipment
-4. Select the equipment in the UI and click **Connect**
-5. Start speaking — the AI will answer based on your uploaded documents
+```
+1. Open http://localhost:3000 in your browser
+2. Create equipment via the API:
+   POST http://localhost:8000/api/v1/equipment/
+   Body: { "name": "Hydraulic Press A1", "description": "..." }
+
+3. Upload its documentation (PDF/DOCX):
+   POST http://localhost:8000/api/v1/equipment/{id}/documents
+   Form: files=<your-pdf>
+
+4. In the UI, select the equipment and click Connect
+5. Allow microphone access and start speaking!
+```
 
 ---
 
@@ -179,56 +239,69 @@ docker-compose up --build
 
 ```
 rag-voice-ai-agent/
-├── backend/                    # FastAPI backend service
-│   ├── main.py                 # Application entry point
-│   ├── Dockerfile              # Backend container config
-│   ├── pyproject.toml          # Python dependencies (uv)
+├── backend/                         # FastAPI backend service
+│   ├── main.py                      # App entry point, CORS & middleware setup
+│   ├── Dockerfile                   # Multi-stage backend container
+│   ├── pyproject.toml               # Python dependencies (managed by uv)
+│   ├── .env.example                 # Environment variable template
 │   └── app/
-│       ├── bot.py              # Pipecat voice pipeline definition
-│       ├── config.py           # Environment configuration
-│       ├── database.py         # MongoDB connection manager
-│       ├── models/             # Pydantic data models
-│       │   ├── document.py     # Document schema
-│       │   ├── equipment.py    # Equipment schema
-│       │   └── rag.py          # RAG retrieval schemas
-│       ├── routers/            # API route handlers
-│       │   ├── equipment.py    # Equipment CRUD + doc upload
-│       │   └── stream.py       # WebSocket streaming endpoint
-│       └── services/           # Business logic
-│           ├── embeddings.py   # Google Gemini embeddings
-│           ├── rag.py          # Vector search & retrieval
-│           └── text_extraction.py  # PDF/DOCX text parser
+│       ├── bot.py                   # Pipecat voice pipeline
+│       │                            #   (Deepgram STT → Groq LLM → ElevenLabs TTS)
+│       ├── config.py                # Pydantic Settings (reads from .env)
+│       ├── database.py              # Async MongoDB connection (Motor)
+│       ├── models/                  # Pydantic data models
+│       │   ├── document.py          # Document upload schema
+│       │   ├── equipment.py         # Equipment CRUD schema
+│       │   └── rag.py               # RAG retrieval result schemas
+│       ├── routers/                 # API route handlers
+│       │   ├── equipment.py         # Equipment CRUD + document ingestion pipeline
+│       │   └── stream.py            # WebSocket voice streaming endpoint
+│       └── services/                # Core business logic
+│           ├── embeddings.py        # Google Gemini text-embedding-004 wrapper
+│           ├── rag.py               # MongoDB Atlas Vector Search + cosine retrieval
+│           └── text_extraction.py   # PDF / DOCX → plain text extractor
 │
-├── frontend/                   # React frontend application
-│   ├── Dockerfile              # Frontend container config
-│   ├── nginx.conf              # Nginx reverse proxy config
-│   ├── package.json            # Node.js dependencies
+├── frontend/                        # React + TypeScript UI
+│   ├── Dockerfile                   # Nginx-based frontend container
+│   ├── nginx.conf                   # Reverse proxy + SPA routing config
+│   ├── package.json                 # Node.js dependencies
 │   └── src/
-│       ├── App.tsx             # Router setup
-│       ├── components/         # UI components
-│       │   ├── RealTimeChatPanel.tsx  # Main voice chat interface
-│       │   ├── BotMessageBubble.tsx   # Bot response display
-│       │   └── UserMessageBubble.tsx  # User message display
-│       ├── hooks/              # Custom React hooks
-│       │   └── pipecat-chat-events.ts # Voice event handlers
+│       ├── App.tsx                  # React Router setup
+│       ├── components/
+│       │   ├── RealTimeChatPanel.tsx # Main voice chat interface with equipment selector
+│       │   ├── BotMessageBubble.tsx  # Bot response message bubble
+│       │   ├── BotJsonCard.tsx       # Renders RAG chunk metadata cards
+│       │   └── UserMessageBubble.tsx # User transcription message bubble
+│       ├── hooks/
+│       │   └── pipecat-chat-events.ts # Pipecat SDK event → chat state bridge
 │       ├── pages/
-│       │   └── Stream.tsx      # Main streaming page
-│       └── utils/              # Helper utilities
+│       │   └── Stream.tsx            # Top-level streaming page with Pipecat provider
+│       ├── types/                    # TypeScript interfaces
+│       │   ├── BotJson.ts            # RAG metadata card type
+│       │   ├── ChatMessage.ts        # Chat message union type
+│       │   ├── Chunk.ts              # Retrieved chunk type
+│       │   └── ServerMessage.ts      # RTVI server message type
+│       └── utils/
+│           ├── api.ts                # REST API helper functions
+│           └── chat.ts               # Chat message processing utilities
 │
-├── infrastructure/             # AWS deployment configs
-│   ├── cloudformation.yaml     # Full AWS infrastructure (VPC, ECS, ALB)
-│   ├── setup-aws.sh            # Automated AWS provisioning
-│   └── destroy-aws.sh          # Clean teardown script
+├── infrastructure/                  # AWS infrastructure as code
+│   ├── cloudformation.yaml          # Full stack: VPC, ECS, ALB, ECR, Secrets Manager
+│   ├── setup-aws.sh                 # One-command AWS provisioning script
+│   └── destroy-aws.sh               # Teardown & cleanup script
 │
-├── scripts/                    # CI/CD & deployment scripts
-│   ├── build-and-push-ecr.sh   # Docker → ECR push
-│   ├── create-services.sh      # ECS service creation
-│   └── deploy_aws.sh           # Full deployment pipeline
+├── scripts/                         # CI/CD & deployment automation
+│   ├── build-and-push-ecr.sh        # Build Docker images → push to ECR
+│   ├── create-services.sh           # Create ECS services (run once after infra setup)
+│   └── deploy_aws.sh                # Force new ECS deployment
 │
-├── docker-compose.yml          # Local development orchestration
-├── DEPLOYMENT.md               # Detailed deployment guide
-├── CONTRIBUTING.md             # Contribution guidelines
-└── LICENSE                     # MIT License
+├── .github/workflows/
+│   └── deploy.yml                   # GitHub Actions CI/CD pipeline
+│
+├── docker-compose.yml               # Local development orchestration
+├── DEPLOYMENT.md                    # Step-by-step AWS deployment guide
+├── CONTRIBUTING.md                  # Contribution guidelines
+└── LICENSE                          # MIT License
 ```
 
 ---
@@ -242,44 +315,53 @@ rag-voice-ai-agent/
 | `POST` | `/api/v1/equipment/` | Create new equipment |
 | `GET` | `/api/v1/equipment/` | List all equipment |
 | `GET` | `/api/v1/equipment/{id}` | Get equipment details |
-| `POST` | `/api/v1/equipment/{id}/documents` | Upload documentation files |
+| `POST` | `/api/v1/equipment/{id}/documents` | Upload & embed documentation files |
+| `GET` | `/api/v1/equipment/{id}/documents` | List documents for an equipment |
 
 ### Voice Streaming
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/v1/stream/connect` | Initialize voice session |
-| `WS` | `/api/v1/stream/ws/{equipment_id}` | WebSocket audio stream |
+| `POST` | `/api/v1/stream/connect` | Initialize a new voice session |
+| `WS` | `/api/v1/stream/ws/{equipment_id}` | WebSocket audio stream (Protobuf serialized) |
 
 ### Health Check
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/health` | Service health status |
+| `GET` | `/` | API root with version info |
 
-Full interactive docs available at `/docs` (Swagger UI) when the backend is running.
+> 📖 Full interactive Swagger UI available at **`http://localhost:8000/docs`** when the backend is running.
 
 ---
 
 ## ☁️ Production Deployment (AWS)
 
-The project includes a complete **AWS ECS Fargate** deployment setup with:
+The project includes a complete **AWS ECS Fargate** deployment setup provisioned entirely via **CloudFormation**:
 
-- **VPC** with public/private subnets across 2 AZs
-- **Application Load Balancer** with health checks
-- **ECS Cluster** with Fargate tasks
-- **ECR** repositories for container images
-- **AWS Secrets Manager** for API key management
-- **NAT Gateway** for private subnet internet access
-- **CloudFormation** for infrastructure-as-code
+| AWS Resource | Purpose |
+|---|---|
+| **VPC** | Isolated network with public/private subnets across 2 AZs |
+| **Application Load Balancer** | HTTPS termination, health checks, request routing |
+| **ECS Cluster (Fargate)** | Serverless container execution — no EC2 to manage |
+| **ECR** | Private Docker image registry for backend & frontend |
+| **Secrets Manager** | Secure storage for all API keys |
+| **NAT Gateway** | Private subnet internet access for ECS tasks |
+| **CloudWatch Logs** | Centralized container log aggregation |
 
 ```bash
-# One-command AWS deployment
+# One-command AWS infrastructure provisioning
 cd infrastructure
 ./setup-aws.sh
 ```
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for the complete step-by-step deployment guide.
+See **[DEPLOYMENT.md](DEPLOYMENT.md)** for the complete step-by-step guide including:
+- IAM permissions setup
+- GitHub Actions CI/CD configuration
+- ECS service creation
+- Secrets management
+- Troubleshooting common issues
 
 ---
 
@@ -287,50 +369,84 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for the complete step-by-step deployment guid
 
 | Decision | Rationale |
 |----------|-----------|
-| **Pipecat AI Framework** | Production-grade voice pipeline with smart turn detection, VAD, and interruptibility |
-| **MongoDB Atlas Vector Search** | Native vector search eliminates need for a separate vector DB (Pinecone, Weaviate) |
-| **Groq for LLM** | Ultra-low latency inference (~200ms) critical for real-time voice conversations |
-| **Google Gemini Embeddings** | High-quality 768-dim embeddings with generous free tier |
-| **ElevenLabs TTS** | Most natural-sounding voice synthesis for production use |
-| **WebSocket Transport** | Full-duplex audio streaming with minimal overhead |
-| **uv Package Manager** | 10-100x faster than pip for Python dependency resolution |
+| **Pipecat AI Framework** | Production-grade voice pipeline with smart turn detection (LocalSmartTurnV3), VAD (Silero), and interruption support |
+| **MongoDB Atlas Vector Search** | Native vector search eliminates a separate vector DB (Pinecone, Weaviate) while keeping documents and vectors co-located |
+| **Groq for LLM** | Ultra-low latency inference (~200 ms) — critical for real-time voice conversations where every millisecond matters |
+| **LLM Tool Calling** | The LLM decides *when* to search the knowledge base, making responses more natural rather than always retrieving context |
+| **Google Gemini Embeddings** | High-quality 768-dim embeddings with cosine similarity, plus a generous free tier for cost-effective prototyping |
+| **ElevenLabs TTS** | Most natural-sounding voice synthesis available, essential for a polished voice experience |
+| **WebSocket Transport** | Full-duplex audio streaming with Protobuf serialization for minimal overhead |
+| **uv Package Manager** | 10–100× faster than pip — dramatically speeds up Docker image builds in CI/CD |
+| **Tenant Isolation** | All queries filter by `tenant_id` and `equipment_id`, enabling multi-tenant SaaS extension |
 
 ---
 
-## 🛠️ Development
+## 🛠️ Local Development (Without Docker)
 
-### Backend (without Docker)
+### Backend
 
 ```bash
 cd backend
-uv sync                    # Install dependencies
-cp .env.example .env       # Configure environment
+uv sync                    # Install dependencies (requires uv: pip install uv)
+cp .env.example .env       # Configure environment variables
 uv run uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### Frontend (without Docker)
+> **Note:** On first run, the Pipecat bot will download the Silero VAD model and LocalSmartTurn model (~20 seconds). Subsequent starts are instant.
+
+### Frontend
 
 ```bash
 cd frontend
 npm install                # Install dependencies
-npm run dev                # Start dev server on :5173
+npm run dev                # Start dev server at http://localhost:5173
 ```
 
-### Environment Variables
+> **Note:** Set `VITE_API_URL=http://localhost:8000` if running frontend separately from Docker.
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `MONGO_URL` | ✅ | MongoDB Atlas connection string |
-| `DB_NAME` | ✅ | Database name |
-| `DEEPGRAM_API_KEY` | ✅ | Deepgram STT API key |
-| `GROQ_API_KEY` | ✅ | Groq LLM API key |
-| `GOOGLE_API_KEY` | ✅ | Google AI embeddings key |
-| `ELEVENLABS_API_KEY` | ✅ | ElevenLabs TTS API key |
-| `ELEVENLABS_VOICE_ID` | ❌ | Custom voice ID (default: Adam) |
-| `GROQ_MODEL` | ❌ | Model name (default: `openai/gpt-oss-20b`) |
-| `CHUNK_SIZE` | ❌ | Text chunk size (default: 1000) |
-| `CHUNK_OVERLAP` | ❌ | Chunk overlap (default: 250) |
-| `ALLOWED_ORIGINS` | ❌ | CORS origins (comma-separated) |
+---
+
+## 🔧 Environment Variables Reference
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `MONGO_URL` | ✅ | — | MongoDB Atlas connection string |
+| `DB_NAME` | ✅ | `live_db` | Target database name |
+| `DEEPGRAM_API_KEY` | ✅ | — | Deepgram Speech-to-Text API key |
+| `GROQ_API_KEY` | ✅ | — | Groq LLM inference API key |
+| `GOOGLE_API_KEY` | ✅ | — | Google AI (Gemini) embeddings key |
+| `ELEVENLABS_API_KEY` | ✅ | — | ElevenLabs Text-to-Speech API key |
+| `ELEVENLABS_VOICE_ID` | ❌ | `pNInz6obpgDQGcFmaJgB` (Adam) | Custom ElevenLabs voice ID |
+| `GROQ_MODEL` | ❌ | `openai/gpt-oss-20b` | Groq model name |
+| `EMBEDDING_MODEL` | ❌ | `models/text-embedding-004` | Google Gemini embedding model |
+| `CHUNK_SIZE` | ❌ | `1000` | Document chunk size (characters) |
+| `CHUNK_OVERLAP` | ❌ | `250` | Overlap between adjacent chunks |
+| `VECTOR_INDEX_NAME` | ❌ | `vector_index` | MongoDB Atlas vector index name |
+| `ALLOWED_ORIGINS` | ❌ | `*` (dev) | Comma-separated CORS allowed origins |
+| `ENVIRONMENT` | ❌ | — | Set to `production` to enforce CORS |
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] **HTTPS / SSL** — Add Let's Encrypt or ACM certificate to the ALB listener
+- [ ] **Authentication** — JWT-based user auth and per-user session history
+- [ ] **Conversation Memory** — Persist session transcripts to MongoDB for context continuity
+- [ ] **Multi-Language Support** — Configurable STT/TTS language per equipment
+- [ ] **Admin Dashboard** — Web UI for equipment and document management (currently API-only)
+- [ ] **Streaming LLM Responses** — Token-by-token TTS for even lower perceived latency
+- [ ] **Analytics** — Session duration, query count, and retrieval score dashboards
+- [ ] **XLSX / CSV Support** — Extend text extraction to spreadsheet formats
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for:
+- Development setup instructions
+- Code style guidelines (PEP 8 for Python, strict TypeScript)
+- Commit message conventions (Conventional Commits)
+- How to open issues and pull requests
 
 ---
 
@@ -342,12 +458,16 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 ## 👤 Author
 
-**Naman Jaiswal**
+<p align="left">
+  <strong>Naman Jaiswal</strong> — Full-Stack & AI Engineer
+</p>
 
-- GitHub: [@jaiswal-naman](https://github.com/jaiswal-naman)
+- 🐙 GitHub: [@jaiswal-naman](https://github.com/jaiswal-naman)
 
 ---
 
 <p align="center">
-  <sub>Built with ❤️ by Naman Jaiswal</sub>
+  <sub>Built with ❤️ by <a href="https://github.com/jaiswal-naman">Naman Jaiswal</a></sub>
+  <br/>
+  <sub>⭐ Star this repo if you find it useful!</sub>
 </p>
